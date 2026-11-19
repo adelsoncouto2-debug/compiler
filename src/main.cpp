@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <iostream>
-
 #include "lex.h"
 #include "glob.h"
+#include "parser.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,8 +19,13 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
  
-    proximo_token(file);
- 
-    fclose(file);
-    return 0; 
+    try {
+        const std::vector<Token> tokens = proximo_token(file);
+        fclose(file);
+        return analisar(tokens) ? EXIT_SUCCESS : EXIT_FAILURE;
+    } catch (const LexicalError& erro) {
+        fclose(file);
+        std::cerr << "Erro: " << erro.what() << "\n";
+        return EXIT_FAILURE;
+    }
 }
